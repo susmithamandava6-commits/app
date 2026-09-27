@@ -1,0 +1,178 @@
+{
+  "app_name": "NetSentinel AI",
+  "personality": "7 Dark-First Utility DARK",
+  "personality_one_liner": "An AI-powered network security guard providing real-time threat detection, OBSERVE-DETECT-EXPLAIN-RESPOND workflows, and instant operational command.",
+  "color": {
+    "surface": "#0E1116",
+    "onSurface": "#F0F3F6",
+    "surfaceSecondary": "#161B22",
+    "onSurfaceSecondary": "#C9D1D9",
+    "surfaceTertiary": "#21262D",
+    "onSurfaceTertiary": "#8B949E",
+    "surfaceInverse": "#F0F3F6",
+    "onSurfaceInverse": "#0E1116",
+    "brand": "#1F6FEB",
+    "brandPrimary": "#238636",
+    "onBrandPrimary": "#FFFFFF",
+    "brandSecondary": "#D29922",
+    "onBrandSecondary": "#0E1116",
+    "brandTertiary": "#115835",
+    "onBrandTertiary": "#3FB950",
+    "success": "#238636",
+    "onSuccess": "#FFFFFF",
+    "warning": "#D29922",
+    "onWarning": "#0E1116",
+    "error": "#DA3633",
+    "onError": "#FFFFFF",
+    "info": "#1F6FEB",
+    "onInfo": "#FFFFFF",
+    "border": "#30363D",
+    "borderStrong": "#8B949E",
+    "divider": "#21262D",
+    "muted": "#8B949E",
+    "onBrand": "#FFFFFF"
+  },
+  "typography": {
+    "displayFontFamily": "BarlowCondensed_600SemiBold",
+    "textFontFamily": "Inter_400Regular",
+    "scale": {
+      "sm": 12,
+      "base": 14,
+      "lg": 16,
+      "xl": 20,
+      "2xl": 24
+    }
+  },
+  "spacing": {
+    "rule": "Generous tactical spacing with vertical rhythm, 16px screen padding, 12px card gaps",
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 24,
+    "2xl": 32,
+    "3xl": 48
+  },
+  "radius_tokens": {
+    "sm": 6,
+    "md": 12,
+    "lg": 20,
+    "pill": 999
+  },
+  "shadow_tier": "0",
+  "navigation": "bottom_tabs",
+  "icon_set": "MaterialCommunityIcons",
+  "glassmorphism": {
+    "enabled": false,
+    "do's": [
+      "Use high-contrast data rows",
+      "Use tactical solid dark surfaces for instant readability"
+    ],
+    "dont's": [
+      "No heavy blurs that obscure telemetry data",
+      "No low contrast text"
+    ]
+  },
+  "platform_libraries": {
+    "glass": {
+      "ios": "expo-blur",
+      "android": "expo-blur",
+      "low_end_android_fallback": "solid surfaceSecondary"
+    },
+    "image": "expo-image",
+    "blur": "expo-blur",
+    "bottom_sheet": "@gorhom/bottom-sheet",
+    "animation": "react-native-reanimated",
+    "gesture": "react-native-gesture-handler"
+  },
+  "screens": [
+    {
+      "name": "Dashboard",
+      "purpose": "Network security command center showing active status, threat count, live traffic chart, and recent security alerts.",
+      "states": {
+        "loading": "Centered loading spinner with tactical pulse",
+        "empty": "No active threat metrics available",
+        "error": "Failed to sync telemetry with daemon. Retry."
+      },
+      "layout": "Sticky header with shield indicator, metrics summary cards in 2x2 grid, live traffic volume sparkline graph, and scrollable list of recent threat alerts with quick AI explanation triggers."
+    },
+    {
+      "name": "Devices",
+      "purpose": "List all connected Wi-Fi and ethernet devices with IP, MAC, status, and risk level grading.",
+      "states": {
+        "loading": "Skeleton rows pulsing on surfaceSecondary",
+        "empty": "No devices discovered on current subnet scan",
+        "error": "Subnet scanning error. Check interface."
+      },
+      "layout": "Search & filter pill row at top, vertical card list with device avatar badge, risk badge (Low/Medium/High), IP/MAC metadata, and quick action toggle."
+    },
+    {
+      "name": "Network Traffic",
+      "purpose": "Monitor active connections, top communicating IPs, protocol ports, and real-time bandwidth volume.",
+      "states": {
+        "loading": "Traffic stream loader",
+        "empty": "No active socket streams recorded",
+        "error": "Packet capture daemon unresponsive"
+      },
+      "layout": "Tabbed filter for Connections / Ports / IP Stats, interactive metric gauges, and detailed real-time log rows."
+    },
+    {
+      "name": "Threat Alerts",
+      "purpose": "Chronological stream of security anomalies with severity grading, detection reasons, and evidence.",
+      "states": {
+        "loading": "Alert stream loader",
+        "empty": "Zero security anomalies detected. Network secure.",
+        "error": "Failed to query alert ledger"
+      },
+      "layout": "Severity filter chips (All, High, Medium, Low), card items with severity color-coding, timestamp, evidence summary, and 'Analyze with AI' button."
+    },
+    {
+      "name": "AI Threat Explanation",
+      "purpose": "Human-readable threat analysis breaking down what happened, why it's suspicious, evidence, and recommended actions.",
+      "states": {
+        "loading": "AI neural reasoning simulation...",
+        "empty": "Select an alert to generate AI analysis",
+        "error": "LLM inference gateway timeout"
+      },
+      "layout": "Structured card stack displaying Event Summary, Suspicion Breakdown, Evidence Table, Potential Threat Classification, and Sticky Action Footer (Block Device / Isolate / Dismiss)."
+    },
+    {
+      "name": "DNS Security",
+      "purpose": "Monitor DNS queries, block suspicious domain resolutions, and track devices querying blacklisted FQDNs.",
+      "states": {
+        "loading": "Querying DNS resolver logs...",
+        "empty": "No DNS queries intercepted in current window",
+        "error": "DNS daemon connection lost"
+      },
+      "layout": "Top summary banner of blocked domains, filterable list of query logs with domain, requesting device, and action taken (Allowed / Blocked)."
+    },
+    {
+      "name": "Firewall",
+      "purpose": "Manage blocked devices, configure allow/block rules, and trigger secure isolate actions with safety confirmation.",
+      "states": {
+        "loading": "Fetching firewall rule table...",
+        "empty": "No firewall rules or blocked devices active",
+        "error": "nftables/iptables sync error"
+      },
+      "layout": "Segmented control for Blocked Devices vs Active Rules, action buttons for manual IP block, and modal confirmation dialogs for destructive actions."
+    },
+    {
+      "name": "Settings",
+      "purpose": "Configure monitoring parameters, alert sensitivity thresholds, API endpoints, and network interfaces.",
+      "states": {
+        "loading": "Loading settings preferences...",
+        "empty": "No configuration parameters found",
+        "error": "Failed to read local store"
+      },
+      "layout": "Grouped preference sections with switches, dropdown selectors for scan frequency, backend API URL input, and database export/reset actions."
+    }
+  ],
+  "images": {
+    "security_hero": {
+      "url": "https://images.unsplash.com/photo-1590859808308-3d2d9c515b1a",
+      "dark": "https://images.unsplash.com/photo-1590859808308-3d2d9c515b1a",
+      "alt": "Dark network grid security background"
+    }
+  },
+  "instructions_to_main_agent": "Build NetSentinel AI as an Expo React Native mobile app in /app/frontend using Dark-First Utility styling. Ensure all 8 screens are fully functional with realistic mock data, persistent local storage, interactive threat analysis via simulated AI service layer, and firewall block/isolate confirmation workflows. Adhere strictly to the dark obsidian theme, high-contrast utility colors, 44pt touch targets, and full safe-area compliance."
+}
