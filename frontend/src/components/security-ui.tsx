@@ -67,7 +67,7 @@ function riskTone(risk: Device["risk"]): "success" | "warning" | "error" {
 export function DeviceRow({ device, onPress }: { device: Device; onPress: () => void }) {
   const styles = useStyles();
   const { colors } = useTheme();
-  return <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => [styles.deviceRow, pressed && styles.pressed]}>
+  return <Pressable testID={`device-${device.id}`} accessibilityLabel={`Open ${device.name} details`} accessibilityRole="button" onPress={onPress} style={({ pressed }) => [styles.deviceRow, pressed && styles.pressed]}>
     <View style={[styles.deviceAvatar, { backgroundColor: `${device.risk === "high" ? colors.error : colors.info}22` }]}><Icon name={device.category === "IoT" ? "speaker-wireless" : device.category === "Entertainment" ? "television" : "laptop"} size={21} color={device.risk === "high" ? colors.error : colors.info} /></View>
     <View style={styles.rowBody}><View style={styles.rowTitleLine}><Text style={styles.rowTitle} numberOfLines={1}>{device.name}</Text><StatusPill label={device.risk.toUpperCase()} tone={riskTone(device.risk)} /></View><Text style={styles.rowMeta}>{device.ip}  ·  {device.mac}</Text><Text style={styles.rowMeta}>{device.connections} connections  ·  {device.lastSeen}</Text></View>
     <Icon name="chevron-right" size={21} color={colors.muted} />
@@ -78,7 +78,7 @@ export function AlertCard({ alert, onPress }: { alert: ThreatAlert; onPress: () 
   const styles = useStyles();
   const { colors } = useTheme();
   const color = alert.severity === "high" ? colors.error : alert.severity === "medium" ? colors.warning : colors.info;
-  return <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => [styles.alertCard, { borderLeftColor: color }, pressed && styles.pressed]}>
+  return <Pressable testID={`alert-${alert.id}`} accessibilityLabel={`Analyze ${alert.title}`} accessibilityRole="button" onPress={onPress} style={({ pressed }) => [styles.alertCard, { borderLeftColor: color }, pressed && styles.pressed]}>
     <View style={styles.alertTop}><StatusPill label={alert.severity.toUpperCase()} tone={alert.severity === "high" ? "error" : alert.severity === "medium" ? "warning" : "info"} /><Text style={styles.timestamp}>{alert.timestamp}</Text></View>
     <Text style={styles.alertTitle}>{alert.title}</Text><Text style={styles.alertReason}>{alert.deviceName}  ·  {alert.reason}</Text><Text style={styles.alertEvidence} numberOfLines={2}>{alert.evidence[0]}</Text>
     <View style={styles.alertFooter}><Text style={[styles.analyzeText, { color }]}>Analyze with AI</Text><Icon name="arrow-right" size={18} color={color} /></View>
@@ -103,7 +103,7 @@ export function BottomNav({ active, onChange }: { active: string; onChange: (val
   const styles = useStyles();
   const { colors } = useTheme();
   const items: { key: string; label: string; icon: IconName }[] = [{ key: "overview", label: "Overview", icon: "view-dashboard-outline" }, { key: "devices", label: "Devices", icon: "devices" }, { key: "traffic", label: "Traffic", icon: "chart-timeline-variant" }, { key: "alerts", label: "Alerts", icon: "bell-outline" }, { key: "more", label: "More", icon: "dots-horizontal" }];
-  return <View style={styles.bottomNav}>{items.map((item) => { const selected = active === item.key; return <Pressable key={item.key} accessibilityRole="button" onPress={() => onChange(item.key)} style={({ pressed }) => [styles.navItem, pressed && styles.pressed]}><Icon name={item.icon} size={22} color={selected ? colors.info : colors.muted} /><Text style={[styles.navLabel, selected && { color: colors.info }]}>{item.label}</Text>{selected ? <View style={styles.navIndicator} /> : null}</Pressable>; })}</View>;
+  return <View style={styles.bottomNav}>{items.map((item) => { const selected = active === item.key; return <Pressable key={item.key} testID={`nav-${item.key}`} accessibilityLabel={item.label} accessibilityRole="button" onPress={() => onChange(item.key)} style={({ pressed }) => [styles.navItem, pressed && styles.pressed]}><Icon name={item.icon} size={22} color={selected ? colors.info : colors.muted} /><Text style={[styles.navLabel, selected && { color: colors.info }]}>{item.label}</Text>{selected ? <View style={styles.navIndicator} /> : null}</Pressable>; })}</View>;
 }
 
 const useStyles = makeStyles((colors) => ({

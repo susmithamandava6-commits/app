@@ -55,6 +55,17 @@ export default function Index() {
 
   useEffect(() => { void loadData(); }, []);
 
+  useEffect(() => {
+    if (Platform.OS !== "web") return;
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      if (selectedAlert) setSelectedAlert(null);
+      else if (selectedDevice) setSelectedDevice(null);
+    };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [selectedAlert, selectedDevice]);
+
   const updateSettings = async (next: AppSettings) => {
     setSettings(next);
     await securityRepository.setSettings(next);
@@ -73,6 +84,7 @@ export default function Index() {
     await securityRepository.setBlockedDeviceIds(nextIds);
     setSnapshot((current) => current ? { ...current, devices: current.devices.map((device) => device.id === deviceId ? { ...device, status: action === "allow" ? "online" : "blocked" } : device) } : current);
     setSelectedDevice((current) => current?.id === deviceId ? { ...current, status: action === "allow" ? "online" : "blocked" } : current);
+    if (action === "isolate") setSelectedAlert(null);
   };
 
   const openExplanation = async (alert: ThreatAlert) => {
@@ -143,7 +155,7 @@ export default function Index() {
 
   const renderFirewall = () => <><ScreenHeader eyebrow="RESPOND" title="Firewall" subtitle="Reversible controls for suspicious endpoints" /><View style={styles.firewallBanner}><Icon name="shield-lock" size={24} color={colors.error} /><View style={styles.rowBody}><Text style={styles.statusTitle}>{blockedCount} device{blockedCount === 1 ? "" : "s"} blocked</Text><Text style={styles.statusSub}>Actions are saved locally for this demo session.</Text></View></View><SectionTitle title="Device rules" />{devices.map((device) => <View key={device.id} style={styles.ruleRow}><View style={styles.ruleDevice}><View style={styles.ruleIcon}><Icon name={device.status === "blocked" ? "shield-off" : "devices"} size={18} color={device.status === "blocked" ? colors.error : colors.info} /></View><View style={styles.rowBody}><Text style={styles.rowTitle}>{device.name}</Text><Text style={styles.rowMeta}>{device.ip}  ·  {device.status === "blocked" ? "blocked by local rule" : "allowed"}</Text></View></View><Pressable accessibilityRole="button" onPress={() => confirmFirewallAction(device, device.status === "blocked" ? "allow" : device.risk === "high" ? "isolate" : "block")} style={({ pressed }) => [styles.smallAction, { borderColor: device.status === "blocked" ? colors.success : device.risk === "high" ? colors.error : colors.border }, pressed && styles.pressed]}><Text style={[styles.smallActionText, { color: device.status === "blocked" ? colors.success : device.risk === "high" ? colors.error : colors.info }]}>{device.status === "blocked" ? "Allow" : device.risk === "high" ? "Isolate" : "Block"}</Text></Pressable></View>)}</>;
 
-  const renderSettings = () => <><ScreenHeader eyebrow="CONFIGURE" title="Settings" subtitle="Tune the monitoring profile for this network" /><View style={styles.settingGroup}><Text style={styles.groupLabel}>MONITORING</Text><SettingToggle title="Monitoring enabled" detail="Keep local observation active" value={settings.monitoringEnabled} onChange={(value) => void updateSettings({ ...settings, monitoringEnabled: value })} /><SettingToggle title="Alert notifications" detail="Show new anomaly signals in the app" value={settings.alertNotifications} onChange={(value) => void updateSettings({ ...settings, alertNotifications: value })} /></View><View style={styles.settingGroup}><Text style={styles.groupLabel}>NETWORK PROFILE</Text><Text style={styles.inputLabel}>Network name</Text><TextInput value={settings.networkName} onChangeText={(value) => setSettings((current) => ({ ...current, networkName: value }))} onBlur={() => void securityRepository.setSettings(settings)} style={styles.settingsInput} placeholderTextColor={colors.muted} /><Text style={styles.inputLabel}>Scan cadence</Text><View style={styles.filterRow}>{(["15 sec", "30 sec", "1 min"] as const).map((value) => <FilterButton key={value} label={value} selected={settings.scanFrequency === value} onPress={() => void updateSettings({ ...settings, scanFrequency: value })} />)}</View></View><View style={styles.settingGroup}><Text style={styles.groupLabel}>SERVICE LAYER</Text><View style={styles.serviceRow}><Icon name="robot-outline" size={20} color={colors.info} /><View style={styles.rowBody}><Text style={styles.rowTitle}>AI explanations</Text><Text style={styles.rowMeta}>Local deterministic demo service · replaceable with Gemini or another provider</Text></View><StatusPill label="LOCAL" tone="info" /></View></View></>;
+  const renderSettings = () => <><ScreenHeader eyebrow="CONFIGURE" title="Settings" subtitle="Tune the monitoring profile for this network" /><View style={styles.settingGroup}><Text style={styles.groupLabel}>MONITORING</Text><SettingToggle title="Monitoring enabled" detail="Keep local observation active" value={settings.monitoringEnabled} onChange={(value) => void updateSettings({ ...settings, monitoringEnabled: value })} /><SettingToggle title="Alert notifications" detail="Show new anomaly signals in the app" value={settings.alertNotifications} onChange={(value) => void updateSettings({ ...settings, alertNotifications: value })} /></View><View style={styles.settingGroup}><Text style={styles.groupLabel}>NETWORK PROFILE</Text><Text style={styles.inputLabel}>Network name</Text><TextInput testID="network-name-input" value={settings.networkName} onChangeText={(value) => { const next = { ...settings, networkName: value }; setSettings(next); void securityRepository.setSettings(next); }} style={styles.settingsInput} placeholderTextColor={colors.muted} /><Text style={styles.inputLabel}>Scan cadence</Text><View style={styles.filterRow}>{(["15 sec", "30 sec", "1 min"] as const).map((value) => <FilterButton key={value} label={value} selected={settings.scanFrequency === value} onPress={() => void updateSettings({ ...settings, scanFrequency: value })} />)}</View></View><View style={styles.settingGroup}><Text style={styles.groupLabel}>SERVICE LAYER</Text><View style={styles.serviceRow}><Icon name="robot-outline" size={20} color={colors.info} /><View style={styles.rowBody}><Text style={styles.rowTitle}>AI explanations</Text><Text style={styles.rowMeta}>Local deterministic demo service · replaceable with Gemini or another provider</Text></View><StatusPill label="LOCAL" tone="info" /></View></View></>;
 
   const content = screen === "overview" ? renderOverview() : screen === "devices" ? renderDevices() : screen === "traffic" ? renderTraffic() : screen === "alerts" ? renderAlerts() : screen === "dns" ? renderDns() : screen === "firewall" ? renderFirewall() : screen === "settings" ? renderSettings() : renderMore();
   const navScreen = ["dns", "firewall", "settings"].includes(screen) ? "more" : screen;
@@ -165,7 +177,7 @@ export default function Index() {
 function FilterButton({ label, selected, onPress }: { label: string; selected: boolean; onPress: () => void }) {
   const styles = useStyles();
   const { colors } = useTheme();
-  return <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => [styles.filterButton, selected && { backgroundColor: `${colors.info}22`, borderColor: colors.info }, pressed && styles.pressed]}><Text style={[styles.filterText, selected && { color: colors.info }]}>{label}</Text></Pressable>;
+  return <Pressable testID={`filter-${label.toLowerCase().replace(/\s+/g, "-")}`} accessibilityLabel={label} accessibilityRole="button" onPress={onPress} style={({ pressed }) => [styles.filterButton, selected && { backgroundColor: `${colors.info}22`, borderColor: colors.info }, pressed && styles.pressed]}><Text style={[styles.filterText, selected && { color: colors.info }]}>{label}</Text></Pressable>;
 }
 
 function ToolCard({ icon, title, detail, onPress }: { icon: keyof typeof MaterialCommunityIcons.glyphMap; title: string; detail: string; onPress: () => void }) {
@@ -189,7 +201,7 @@ function SettingToggle({ title, detail, value, onChange }: { title: string; deta
 function ModalHeader({ title, onClose }: { title: string; onClose: () => void }) {
   const styles = useStyles();
   const { colors } = useTheme();
-  return <View style={styles.modalHeader}><Text style={styles.modalHeaderTitle}>{title}</Text><Pressable accessibilityRole="button" onPress={onClose} style={styles.closeButton}><Icon name="close" size={21} color={colors.onSurface} /></Pressable></View>;
+  return <View style={styles.modalHeader}><Text style={styles.modalHeaderTitle}>{title}</Text><Pressable testID="modal-close" accessibilityLabel="Close modal" accessibilityRole="button" onPress={onClose} style={styles.closeButton}><Icon name="close" size={21} color={colors.onSurface} /></Pressable></View>;
 }
 
 function Detail({ label, value }: { label: string; value: string }) {

@@ -31,7 +31,20 @@ dist/
 dist
 
 # Environment files (comprehensive coverage)
+# Emergent files
+.emergent/
+archive/
+archive (1)/
+test_reports/
+yarn.lock
 
+# Environment files
+.env
+.env.*
+!.env.example
+
+# ZIP files
+*.zip
 *token.json*
 *credentials.json*
 
@@ -79,4 +92,4 @@ agenthub/agents/youtube/db
 memory/test_credentials.md
 
 # Mobile development
-android-sdk/
+android-sdk/archive.zip
